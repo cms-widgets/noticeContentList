@@ -1,16 +1,15 @@
-
 <!--预览视图-->
 <div xmlns:th="http://www.thymeleaf.org">
     <!--/*@thymesVar id="serial" type="java.lang.String"*/-->
     <!--/*@thymesVar id="count" type="java.lang.Number"*/-->
     <!--/*@thymesVar id="pagePath" type="java.lang.String"*/-->
-    <div class="newFlash-pane">
-        <url>
+    <div class="notice-content-list">
+        <ul class="list-unstyled">
             <li th:each="content:${dataList}">
-                    <span th:text="${content.title}">name</span>
-                    <p th:utext="${content.content}" ></p>
+                    <h1 class="notice-content-list-header" th:text="${content.title}">渠道销售</h1>
+                    <div class="notice-content-list-heade-body" th:utext="${content.content}" ></div>
             </li>
-        </url>
+        </ul>
     </div>
 </div>
 <!--/预览视图-->
