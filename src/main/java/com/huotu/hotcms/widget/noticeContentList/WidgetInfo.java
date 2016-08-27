@@ -8,16 +8,23 @@
  */
 
 package com.huotu.hotcms.widget.noticeContentList;
+import com.huotu.hotcms.service.entity.Category;
+import com.huotu.hotcms.service.entity.Notice;
+import com.huotu.hotcms.widget.CMSContext;
 import com.huotu.hotcms.widget.ComponentProperties;
+import com.huotu.hotcms.widget.PreProcessWidget;
 import com.huotu.hotcms.widget.Widget;
 import com.huotu.hotcms.widget.WidgetStyle;
+import com.huotu.hotcms.widget.service.CMSDataSourceService;
 import me.jiangcai.lib.resource.service.ResourceService;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
+import org.springframework.util.NumberUtils;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -25,9 +32,10 @@ import java.util.Map;
 /**
  * @author CJ
  */
-public class WidgetInfo implements Widget{
+public class WidgetInfo implements Widget , PreProcessWidget {
     public static final String SERIAL = "serial";
     public static final String COUNT = "count";
+    public static final String DATA_LIST = "dataList";
 
 
     @Override
@@ -47,6 +55,7 @@ public class WidgetInfo implements Widget{
         }
         return "noticeContentList";
     }
+
 
     @Override
     public String description(Locale locale) {
@@ -101,9 +110,28 @@ public class WidgetInfo implements Widget{
     @Override
     public ComponentProperties defaultProperties(ResourceService resourceService) throws IOException {
         ComponentProperties properties = new ComponentProperties();
+        // 随意找一个数据源,如果没有。那就没有。。
+        CMSDataSourceService cmsDataSourceService = CMSContext.RequestContext().getWebApplicationContext()
+                .getBean(CMSDataSourceService.class);
+
+        List<Category> categories = cmsDataSourceService.findNoticeCategory();
+        if (categories.isEmpty()) {
+            throw new IllegalStateException("请至少添加一个数据源再使用这个控件。");
+        }
         properties.put(COUNT,10);
-        properties.put(SERIAL,"123123");
+        properties.put(SERIAL,categories.get(0).getSerial());
         return properties;
     }
 
+    @Override
+    public void prepareContext(WidgetStyle style, ComponentProperties properties, Map<String, Object> variables
+            , Map<String, String> parameters) {
+        String serial = (String) properties.get(SERIAL);
+        CMSDataSourceService cmsDataSourceService = CMSContext.RequestContext().getWebApplicationContext()
+                .getBean(CMSDataSourceService.class);
+        int count = NumberUtils.parseNumber(variables.get(COUNT).toString(),Integer.class);
+        List<Notice> list = cmsDataSourceService.findNoticeContent(serial,count);
+        variables.put(DATA_LIST,list);
+
+    }
 }

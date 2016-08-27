@@ -6,7 +6,7 @@
     <!--/*@thymesVar id="pagePath" type="java.lang.String"*/-->
     <div class="newFlash-pane">
         <url>
-            <li th:each="content:${@cmsDataSourceService.findNoticeContent(serial,count)}">
+            <li th:each="content:${dataList}">
                     <span th:text="${content.title}">name</span>
                     <p th:utext="${content.content}" ></p>
             </li>
