@@ -8,6 +8,7 @@
  */
 
 package com.huotu.hotcms.widget.noticeContentList;
+
 import com.huotu.hotcms.service.entity.Category;
 import com.huotu.hotcms.service.entity.Notice;
 import com.huotu.hotcms.widget.CMSContext;
@@ -32,7 +33,7 @@ import java.util.Map;
 /**
  * @author CJ
  */
-public class WidgetInfo implements Widget , PreProcessWidget {
+public class WidgetInfo implements Widget, PreProcessWidget {
     public static final String SERIAL = "serial";
     public static final String COUNT = "count";
     public static final String DATA_LIST = "dataList";
@@ -76,7 +77,7 @@ public class WidgetInfo implements Widget , PreProcessWidget {
     }
 
     @Override
-    public Resource widgetDependencyContent(MediaType mediaType){
+    public Resource widgetDependencyContent(MediaType mediaType) {
         if (mediaType.equals(Widget.Javascript))
             return new ClassPathResource("js/widgetInfo.js", getClass().getClassLoader());
         return null;
@@ -85,18 +86,18 @@ public class WidgetInfo implements Widget , PreProcessWidget {
     @Override
     public Map<String, Resource> publicResources() {
         Map<String, Resource> map = new HashMap<>();
-        map.put("thumbnail/defaultStyleThumbnail.png",new ClassPathResource("thumbnail/defaultStyleThumbnail.png",getClass().getClassLoader()));
+        map.put("thumbnail/defaultStyleThumbnail.png", new ClassPathResource("thumbnail/defaultStyleThumbnail.png", getClass().getClassLoader()));
         return map;
     }
 
     @Override
     public void valid(String styleId, ComponentProperties componentProperties) throws IllegalArgumentException {
-        WidgetStyle style = WidgetStyle.styleByID(this,styleId);
+        WidgetStyle style = WidgetStyle.styleByID(this, styleId);
         //加入控件独有的属性验证
         String serial = (String) componentProperties.get(SERIAL);
         int count = Integer.valueOf(componentProperties.get(COUNT).toString());
 
-        if (serial == null || count<1 ){
+        if (serial == null || count < 1) {
             throw new IllegalArgumentException("参数错误");
         }
     }
@@ -108,20 +109,17 @@ public class WidgetInfo implements Widget , PreProcessWidget {
 
 
     @Override
-    public ComponentProperties defaultProperties(ResourceService resourceService) throws IOException,IllegalStateException {
+    public ComponentProperties defaultProperties(ResourceService resourceService) throws IOException, IllegalStateException {
         ComponentProperties properties = new ComponentProperties();
         // 随意找一个数据源,如果没有。那就没有。。
         CMSDataSourceService cmsDataSourceService = CMSContext.RequestContext().getWebApplicationContext()
                 .getBean(CMSDataSourceService.class);
 
         List<Category> categories = cmsDataSourceService.findNoticeCategory();
-        if (categories.isEmpty()) {
-            properties.put(SERIAL,"");
-//            throw new IllegalStateException("请至少添加一个数据源再使用这个控件。");
-        }else{
-            properties.put(SERIAL,categories.get(0).getSerial());
-        }
-        properties.put(COUNT,10);
+        if (categories.isEmpty())
+            throw new IllegalStateException("请至少添加一个数据源再使用这个控件。");
+        properties.put(SERIAL, categories.get(0).getSerial());
+        properties.put(COUNT, 10);
         return properties;
     }
 
@@ -131,9 +129,9 @@ public class WidgetInfo implements Widget , PreProcessWidget {
         String serial = (String) properties.get(SERIAL);
         CMSDataSourceService cmsDataSourceService = CMSContext.RequestContext().getWebApplicationContext()
                 .getBean(CMSDataSourceService.class);
-        int count = NumberUtils.parseNumber(variables.get(COUNT).toString(),Integer.class);
-        List<Notice> list = cmsDataSourceService.findNoticeContent(serial,count);
-        variables.put(DATA_LIST,list);
+        int count = NumberUtils.parseNumber(variables.get(COUNT).toString(), Integer.class);
+        List<Notice> list = cmsDataSourceService.findNoticeContent(serial, count);
+        variables.put(DATA_LIST, list);
 
     }
 }
