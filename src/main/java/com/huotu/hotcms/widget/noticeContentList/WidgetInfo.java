@@ -9,8 +9,10 @@
 
 package com.huotu.hotcms.widget.noticeContentList;
 
+import com.huotu.hotcms.service.common.ContentType;
 import com.huotu.hotcms.service.entity.Category;
 import com.huotu.hotcms.service.entity.Notice;
+import com.huotu.hotcms.service.repository.CategoryRepository;
 import com.huotu.hotcms.widget.CMSContext;
 import com.huotu.hotcms.widget.ComponentProperties;
 import com.huotu.hotcms.widget.PreProcessWidget;
@@ -28,6 +30,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.UUID;
 
 
 /**
@@ -115,10 +118,20 @@ public class WidgetInfo implements Widget, PreProcessWidget {
         CMSDataSourceService cmsDataSourceService = CMSContext.RequestContext().getWebApplicationContext()
                 .getBean(CMSDataSourceService.class);
 
-        List<Category> categories = cmsDataSourceService.findNoticeCategory();
-        if (categories.isEmpty())
-            throw new IllegalStateException("请至少添加一个数据源再使用这个控件。");
-        properties.put(SERIAL, categories.get(0).getSerial());
+        List<Category> categoryList = cmsDataSourceService.findNoticeCategory();
+        if (categoryList.isEmpty()) {
+            CategoryRepository categoryRepository = CMSContext.RequestContext().getWebApplicationContext()
+                    .getBean(CategoryRepository.class);
+            Category category = new Category();
+            category.setContentType(ContentType.Notice);
+            category.setName("招聘公告");
+            category.setSerial(UUID.randomUUID().toString());
+            category.setSite(CMSContext.RequestContext().getSite());
+            categoryRepository.save(category);
+            properties.put(SERIAL, category.getSerial());
+//            throw new IllegalStateException("请至少添加一个数据源再使用这个控件。");
+        } else
+            properties.put(SERIAL, categoryList.get(0).getSerial());
         properties.put(COUNT, 10);
         return properties;
     }
