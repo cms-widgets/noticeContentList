@@ -13,6 +13,7 @@ import com.huotu.hotcms.service.common.ContentType;
 import com.huotu.hotcms.service.entity.Category;
 import com.huotu.hotcms.service.entity.Notice;
 import com.huotu.hotcms.service.repository.CategoryRepository;
+import com.huotu.hotcms.service.repository.NoticeRepository;
 import com.huotu.hotcms.widget.CMSContext;
 import com.huotu.hotcms.widget.ComponentProperties;
 import com.huotu.hotcms.widget.PreProcessWidget;
@@ -26,6 +27,7 @@ import org.springframework.http.MediaType;
 import org.springframework.util.NumberUtils;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -63,8 +65,8 @@ public class WidgetInfo implements Widget, PreProcessWidget {
 
     @Override
     public String description(Locale locale) {
-        if (locale.equals(Locale.CHINESE)) {
-            return "这是一个 A custom Widget，你可以对组件进行自定义修改。";
+        if (locale.equals(Locale.CHINA)) {
+            return "这是一个公告列表，你可以对组件进行自定义修改。";
         }
         return "This is a noticeContentList,  you can make custom change the component.";
     }
@@ -122,13 +124,23 @@ public class WidgetInfo implements Widget, PreProcessWidget {
         if (categoryList.isEmpty()) {
             CategoryRepository categoryRepository = CMSContext.RequestContext().getWebApplicationContext()
                     .getBean(CategoryRepository.class);
+            NoticeRepository noticeRepository = CMSContext.RequestContext().getWebApplicationContext()
+                    .getBean(NoticeRepository.class);
             Category category = new Category();
             category.setContentType(ContentType.Notice);
-            category.setName("招聘公告");
+            category.setName("数据源");
             category.setSerial(UUID.randomUUID().toString());
             category.setSite(CMSContext.RequestContext().getSite());
             categoryRepository.save(category);
             properties.put(SERIAL, category.getSerial());
+            Notice notice = new Notice();
+            notice.setContent("公告内容信息");
+            notice.setTitle("公告标题");
+            notice.setCategory(category);
+            notice.setSerial(UUID.randomUUID().toString());
+            notice.setDeleted(false);
+            notice.setCreateTime(LocalDateTime.now());
+            noticeRepository.save(notice);
 //            throw new IllegalStateException("请至少添加一个数据源再使用这个控件。");
         } else
             properties.put(SERIAL, categoryList.get(0).getSerial());
