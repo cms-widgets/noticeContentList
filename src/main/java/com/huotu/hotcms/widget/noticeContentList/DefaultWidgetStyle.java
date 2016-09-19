@@ -28,7 +28,7 @@ public class DefaultWidgetStyle implements WidgetStyle{
     @Override
     public String name(Locale locale) {
         if (locale.equals(Locale.CHINA)) {
-            return "默认样式";
+            return "默认";
         }
         return "default";
     }

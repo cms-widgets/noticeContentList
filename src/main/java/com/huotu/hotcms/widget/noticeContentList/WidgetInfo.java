@@ -14,6 +14,7 @@ import com.huotu.hotcms.service.entity.Category;
 import com.huotu.hotcms.service.entity.Notice;
 import com.huotu.hotcms.service.repository.CategoryRepository;
 import com.huotu.hotcms.service.repository.NoticeRepository;
+import com.huotu.hotcms.service.service.CategoryService;
 import com.huotu.hotcms.widget.CMSContext;
 import com.huotu.hotcms.widget.ComponentProperties;
 import com.huotu.hotcms.widget.PreProcessWidget;
@@ -21,6 +22,7 @@ import com.huotu.hotcms.widget.Widget;
 import com.huotu.hotcms.widget.WidgetStyle;
 import com.huotu.hotcms.widget.service.CMSDataSourceService;
 import me.jiangcai.lib.resource.service.ResourceService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
@@ -42,6 +44,9 @@ public class WidgetInfo implements Widget, PreProcessWidget {
     public static final String SERIAL = "serial";
     public static final String COUNT = "count";
     public static final String DATA_LIST = "dataList";
+
+    @Autowired
+    private CategoryService categoryService;
 
 
     @Override
@@ -129,7 +134,7 @@ public class WidgetInfo implements Widget, PreProcessWidget {
             Category category = new Category();
             category.setContentType(ContentType.Notice);
             category.setName("数据源");
-            category.setSerial(UUID.randomUUID().toString());
+            categoryService.init(category);
             category.setSite(CMSContext.RequestContext().getSite());
             categoryRepository.save(category);
             properties.put(SERIAL, category.getSerial());
