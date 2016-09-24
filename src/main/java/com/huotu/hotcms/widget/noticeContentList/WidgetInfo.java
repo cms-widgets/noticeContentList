@@ -22,7 +22,6 @@ import com.huotu.hotcms.widget.Widget;
 import com.huotu.hotcms.widget.WidgetStyle;
 import com.huotu.hotcms.widget.service.CMSDataSourceService;
 import me.jiangcai.lib.resource.service.ResourceService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
@@ -44,9 +43,6 @@ public class WidgetInfo implements Widget, PreProcessWidget {
     public static final String SERIAL = "serial";
     public static final String COUNT = "count";
     public static final String DATA_LIST = "dataList";
-
-    @Autowired
-    private CategoryService categoryService;
 
 
     @Override
@@ -124,6 +120,8 @@ public class WidgetInfo implements Widget, PreProcessWidget {
         // 随意找一个数据源,如果没有。那就没有。。
         CMSDataSourceService cmsDataSourceService = CMSContext.RequestContext().getWebApplicationContext()
                 .getBean(CMSDataSourceService.class);
+        CategoryService categoryService = CMSContext.RequestContext().getWebApplicationContext()
+                .getBean(CategoryService.class);
 
         List<Category> categoryList = cmsDataSourceService.findNoticeCategory();
         if (categoryList.isEmpty()) {
@@ -146,7 +144,6 @@ public class WidgetInfo implements Widget, PreProcessWidget {
             notice.setDeleted(false);
             notice.setCreateTime(LocalDateTime.now());
             noticeRepository.save(notice);
-//            throw new IllegalStateException("请至少添加一个数据源再使用这个控件。");
         } else
             properties.put(SERIAL, categoryList.get(0).getSerial());
         properties.put(COUNT, 10);

@@ -13,7 +13,7 @@
 
     <groupId>com.huotu.hotcms.widget.noticeContentList</groupId>
     <artifactId>noticeContentList</artifactId>
-    <version>1.0.3</version>
+    <version>1.1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>noticeContentList</name>
