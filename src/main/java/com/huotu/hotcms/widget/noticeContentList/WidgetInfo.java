@@ -110,17 +110,13 @@ public class WidgetInfo implements Widget, PreProcessWidget {
     public ComponentProperties defaultProperties(ResourceService resourceService) throws IOException, IllegalStateException {
         ComponentProperties properties = new ComponentProperties();
         // 随意找一个数据源,如果没有。那就没有。。
-        CMSDataSourceService cmsDataSourceService = CMSContext.RequestContext().getWebApplicationContext()
-                .getBean(CMSDataSourceService.class);
-        CategoryService categoryService = CMSContext.RequestContext().getWebApplicationContext()
-                .getBean(CategoryService.class);
-
-        List<Category> categoryList = cmsDataSourceService.findNoticeCategory();
+        CategoryService categoryService = getCMSServiceFromCMSContext(CategoryService.class);
+        CategoryRepository categoryRepository = getCMSServiceFromCMSContext(CategoryRepository.class);
+        List<Category> categoryList = categoryRepository.findBySiteAndContentTypeAndDeletedFalse
+                (CMSContext.RequestContext().getSite(), ContentType.Notice);
         if (categoryList.isEmpty()) {
-            CategoryRepository categoryRepository = CMSContext.RequestContext().getWebApplicationContext()
-                    .getBean(CategoryRepository.class);
-            NoticeRepository noticeRepository = CMSContext.RequestContext().getWebApplicationContext()
-                    .getBean(NoticeRepository.class);
+
+            NoticeRepository noticeRepository = getCMSServiceFromCMSContext(NoticeRepository.class);
             Category category = new Category();
             category.setContentType(ContentType.Notice);
             category.setName("数据源");
